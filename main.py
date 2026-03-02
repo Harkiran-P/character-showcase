@@ -5,7 +5,7 @@ from sys import exit
 # config
 window_width = 1280
 window_height = 720
-border_color = (108, 99, 255)
+border_color = (49, 230, 59)
 bg_color = (18, 8, 32)
 
 border = 20
@@ -19,6 +19,7 @@ pygame.display.set_caption("CHARACTER DISPLAY")
 clock = pygame.time.Clock()
 
 font_small = pygame.font.Font("assets/fonts/SpaceMono-Regular.ttf", 14)
+font_big = pygame.font.Font("assets/fonts/BebasNeue-Regular.ttf",60)
 
 # scanlines
 def create_scanlines(size):
@@ -55,6 +56,12 @@ while True:
     pygame.draw.line(window, border_color, (border, window_height - border), (window_width - border, window_height - border), 1)
 
     window.blit(topline, (text_x, border - 9))
+
+    # big text
+    title_text = font_big.render("PLANET EARTH", True, border_color)
+    text_width = topline.get_width()
+
+    window.blit(title_text, (text_x + 30, 150))
 
     # glitch lines
     if random.randint(0, 120) == 0:
