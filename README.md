@@ -1,2 +1,2 @@
-# character-showcase
-An interactive python project that displays different characters and relevant information. 
+# alien-terminal
+An interactive python project using pygame which displays an ascii globe with interactive buttons
