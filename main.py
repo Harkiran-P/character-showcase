@@ -39,10 +39,27 @@ btn_y = 620
 IDLE = 'idle'
 EXPANDING = 'expanding'
 OPEN = 'open'
-
 panel_state = IDLE
 anim_progress = 0.0  
 anim_speed = 0.04  
+
+# typing animation
+STATS_LINES = [
+    "> AS OF: 07-03-2026 20:16 GMT:",
+    "> POPULATION: 8,300,000,000",
+    "> CO2 (PPM): 420.0",
+    "> COUNTRIES: 197",
+    "> SURFACE AREA: 510,072,000 KM^2",
+]
+
+type_line = 0      
+type_char = 0      
+type_timer = 0     
+type_speed = 1      
+type_pause = 30     
+type_pause_timer = 0
+cursor_timer = 0    
+typing_done = False
 
 # setup
 pygame.init() 
@@ -194,6 +211,27 @@ while True:
         anim_progress = min(1.0, anim_progress + anim_speed)
         if anim_progress >= 1.0:
             panel_state = OPEN
+
+    # typing logic
+    if panel_state == OPEN and not typing_done:
+        if type_pause_timer > 0:
+            type_pause_timer -= 1
+        else:
+            type_timer += 1
+            if type_timer >= type_speed:
+                type_timer = 0
+                type_char += 1
+                if type_char > len(STATS_LINES[type_line]):
+                    type_char = len(STATS_LINES[type_line])
+                    type_pause_timer = type_pause
+                    type_line += 1
+                    type_char = 0
+                    if type_line >= len(STATS_LINES):
+                        type_line = len(STATS_LINES)
+                        typing_done = True
+
+    cursor_timer += 1
+    cursor_visible = (cursor_timer % 60) < 30
     
     if panel_state == IDLE:
         scanButton.listen(events)
@@ -207,6 +245,22 @@ while True:
         
         pygame.draw.rect(window, bg_color, (cur_x, cur_y, cur_w, cur_h))
         pygame.draw.rect(window, border_color, (cur_x, cur_y, cur_w, cur_h), 1)
+
+        # typed lines
+        padding = 20
+        line_x = cur_x + padding
+        line_y = cur_y + padding
+
+        for i in range(type_line):
+            line_surf = font_small.render(STATS_LINES[i], True, border_color)
+            window.blit(line_surf, (line_x, line_y + i * (font_small.get_height() + 6)))
+
+        if type_line < len(STATS_LINES):
+            current = STATS_LINES[type_line][:type_char]
+            if cursor_visible:
+                current += '_'
+            line_surf = font_small.render(current, True, border_color)
+            window.blit(line_surf, (line_x, line_y + type_line * (font_small.get_height() + 6)))
 
     # glitch lines
     if random.randint(0, 120) == 0:
